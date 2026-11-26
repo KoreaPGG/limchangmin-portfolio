@@ -1,0 +1,11 @@
+.DS_Store
+
+/assets/*
+!/assets/work-gallery/
+!/assets/work-gallery/**
+!/assets/exhibition/
+!/assets/exhibition/**
+!/assets/work-videos-optimized/
+!/assets/work-videos-optimized/**
+!/assets/profile.jpg
+!/assets/dm-sans.woff2
