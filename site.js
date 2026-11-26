@@ -195,10 +195,10 @@ function renderWork() {
         <h2 id="year-${year}">${year}</h2>
         <div class="work-grid">${yearWorks
           .map(
-            ({ title, image, video, index }) => `<article class="work-card">
+            ({ title, image, video, previewScale, index }) => `<article class="work-card">
               <button class="work-image-button${video ? " work-image-button--video" : ""}" type="button" data-work-index="${index}" aria-label="${video ? "Play video" : "View artwork"}: ${title}">
                 ${video
-                  ? `<video class="work-video-preview" data-src="${assetPath(video)}" poster="${assetPath(image)}" muted loop playsinline preload="none" aria-hidden="true"></video>`
+                  ? `<video class="work-video-preview" data-src="${assetPath(video)}" poster="${assetPath(image)}"${previewScale ? ` style="--preview-scale: ${previewScale}"` : ""} muted loop playsinline preload="none" aria-hidden="true"></video>`
                   : `<img src="${assetPath(image)}" alt="${title}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />`}
               </button>
               <p>${title}</p>
@@ -319,16 +319,29 @@ const pageContent = {
 app.innerHTML = `${header()}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
 
 if (page === "home") {
+  // Content bounds in 480×270 frames, excluding borders baked into the videos.
   const homeVideos = [
-    "home-videos/work-003.mp4",
-    "home-videos/work-005.mp4",
-    "home-videos/work-045.mp4",
-    "home-videos/work-016.mp4",
-    "home-videos/work-065.mp4",
+    { source: "home-videos/work-003.mp4?v=2", bounds: [45, 3, 391, 264] },
+    { source: "home-videos/work-005.mp4?v=2", bounds: [31, 5, 419, 259] },
+    { source: "home-videos/work-045.mp4?v=2", bounds: [42, 2, 397, 266] },
+    { source: "home-videos/work-016.mp4?v=2", bounds: [39, 2, 403, 268] },
+    { source: "home-videos/work-065.mp4?v=2", bounds: [37, 0, 406, 270] },
   ];
   const video = document.querySelector(".hero-video");
   const retry = document.querySelector(".hero-retry");
   let lastVideo;
+  let currentVideo;
+
+  function updateVideoScale() {
+    const [left, top, width, height] = currentVideo.bounds;
+    const aspectRatio = video.clientWidth / video.clientHeight;
+    const visibleWidth = Math.min(480, 270 * aspectRatio);
+    const visibleHeight = Math.min(270, 480 / aspectRatio);
+    const halfContentWidth = Math.min(240 - left, left + width - 240) - 1;
+    const halfContentHeight = Math.min(135 - top, top + height - 135) - 1;
+    const scale = Math.max(1, visibleWidth / (2 * halfContentWidth), visibleHeight / (2 * halfContentHeight));
+    video.style.setProperty("--hero-video-scale", scale);
+  }
 
   function playVideo() {
     const source = video.getAttribute("src");
@@ -346,8 +359,9 @@ if (page === "home") {
       console.warn("Unable to read the previous home video.", error);
     }
 
-    const choices = homeVideos.filter((source) => source !== lastVideo);
-    lastVideo = choices[Math.floor(Math.random() * choices.length)];
+    const choices = homeVideos.filter(({ source }) => source !== lastVideo);
+    currentVideo = choices[Math.floor(Math.random() * choices.length)];
+    lastVideo = currentVideo.source;
     try {
       sessionStorage.setItem("home-video", lastVideo);
     } catch (error) {
@@ -355,6 +369,7 @@ if (page === "home") {
     }
 
     retry.hidden = true;
+    updateVideoScale();
     video.src = assetPath(lastVideo);
     video.load();
     playVideo();
@@ -373,6 +388,7 @@ if (page === "home") {
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) chooseVideo();
   });
+  window.addEventListener("resize", updateVideoScale);
   chooseVideo();
 }
 

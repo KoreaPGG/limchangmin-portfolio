@@ -119,6 +119,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(var(--hero-video-scale, 1));
   pointer-events: none;
 }
 
@@ -198,11 +199,18 @@ button {
   cursor: pointer;
 }
 
+.work-video-preview {
+  transform: scale(var(--preview-scale, 1));
+}
+
 .work-image-button:hover img,
-.work-image-button:focus-visible img,
+.work-image-button:focus-visible img {
+  transform: scale(1.025);
+}
+
 .work-image-button:hover video,
 .work-image-button:focus-visible video {
-  transform: scale(1.025);
+  transform: scale(calc(var(--preview-scale, 1) * 1.025));
 }
 
 .work-video-preview::-webkit-media-controls-start-playback-button {
