@@ -222,10 +222,7 @@ function renderWork() {
       <div class="exhibition-grid">${exhibitionGallery}</div>
     </section>
     <dialog class="work-lightbox" aria-label="Artwork viewer">
-      <figure>
-        <img class="lightbox-image" alt="" />
-        <figcaption class="lightbox-caption"></figcaption>
-      </figure>
+      <img class="lightbox-image" alt="" />
     </dialog>
     <dialog class="video-lightbox" aria-label="Work video">
       <video class="video-lightbox-player" controls playsinline preload="none"></video>
@@ -380,7 +377,6 @@ if (page === "home") {
 if (page === "work") {
   const dialog = document.querySelector(".work-lightbox");
   const image = dialog.querySelector(".lightbox-image");
-  const caption = dialog.querySelector(".lightbox-caption");
   const videoDialog = document.querySelector(".video-lightbox");
   const videoPlayer = videoDialog.querySelector(".video-lightbox-player");
   const videoStatus = videoDialog.querySelector(".video-lightbox-status");
@@ -391,7 +387,6 @@ if (page === "work") {
     const work = works[activeIndex];
     image.src = assetPath(work.image);
     image.alt = work.title;
-    caption.textContent = work.title;
   }
 
   document.querySelectorAll("[data-work-index]").forEach((button) => {
@@ -415,7 +410,7 @@ if (page === "work") {
   });
 
   dialog.addEventListener("click", (event) => {
-    if (event.target === dialog || event.target === image.parentElement) dialog.close();
+    if (event.target === dialog) dialog.close();
   });
   dialog.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
