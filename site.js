@@ -221,16 +221,12 @@ function renderWork() {
       <div class="exhibition-grid">${exhibitionGallery}</div>
     </section>
     <dialog class="work-lightbox" aria-label="Artwork viewer">
-      <button class="lightbox-close" type="button" aria-label="Close artwork viewer">×</button>
-      <button class="lightbox-arrow lightbox-previous" type="button" aria-label="Previous artwork">‹</button>
       <figure>
         <img class="lightbox-image" alt="" />
         <figcaption class="lightbox-caption"></figcaption>
       </figure>
-      <button class="lightbox-arrow lightbox-next" type="button" aria-label="Next artwork">›</button>
     </dialog>
     <dialog class="video-lightbox" aria-label="Work video">
-      <button class="video-lightbox-close" type="button" aria-label="Close video">×</button>
       <video class="video-lightbox-player" controls playsinline preload="none"></video>
       <p class="video-lightbox-status" aria-live="polite"></p>
     </dialog>
@@ -359,11 +355,8 @@ if (page === "work") {
     });
   });
 
-  dialog.querySelector(".lightbox-close").addEventListener("click", () => dialog.close());
-  dialog.querySelector(".lightbox-previous").addEventListener("click", () => showWork(activeIndex - 1));
-  dialog.querySelector(".lightbox-next").addEventListener("click", () => showWork(activeIndex + 1));
   dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog || event.target === image.parentElement) dialog.close();
   });
   dialog.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -375,14 +368,19 @@ if (page === "work") {
     if (event.key === "ArrowRight") showWork(activeIndex + 1);
   });
 
-  videoDialog.querySelector(".video-lightbox-close").addEventListener("click", () => videoDialog.close());
   videoDialog.addEventListener("click", (event) => {
     if (event.target === videoDialog) videoDialog.close();
+  });
+  videoPlayer.addEventListener("loadedmetadata", () => {
+    if (videoPlayer.videoWidth && videoPlayer.videoHeight) {
+      videoDialog.style.setProperty("--video-aspect-ratio", videoPlayer.videoWidth / videoPlayer.videoHeight);
+    }
   });
   videoDialog.addEventListener("close", () => {
     videoPlayer.pause();
     videoPlayer.removeAttribute("src");
     videoPlayer.removeAttribute("poster");
+    videoDialog.style.removeProperty("--video-aspect-ratio");
     videoPlayer.load();
     videoStatus.textContent = "";
   });
