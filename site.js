@@ -322,7 +322,7 @@ if (page === "home") {
   // Content bounds in 480×270 frames, excluding borders baked into the videos.
   const homeVideos = [
     { source: "home-videos/work-003.mp4?v=2", bounds: [45, 3, 391, 264] },
-    { source: "home-videos/work-005.mp4?v=2", bounds: [31, 5, 419, 259] },
+    { source: "home-videos/work-005.mp4?v=2", bounds: [36, 8, 412, 250] },
     { source: "home-videos/work-045.mp4?v=2", bounds: [42, 2, 397, 266] },
     { source: "home-videos/work-016.mp4?v=2", bounds: [39, 2, 403, 268] },
     { source: "home-videos/work-065.mp4?v=2", bounds: [37, 0, 406, 270] },
