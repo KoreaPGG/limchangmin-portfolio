@@ -197,7 +197,9 @@ function renderWork() {
           .map(
             ({ title, image, video, index }) => `<article class="work-card">
               <button class="work-image-button${video ? " work-image-button--video" : ""}" type="button" data-work-index="${index}" aria-label="${video ? "Play video" : "View artwork"}: ${title}">
-                <img src="${assetPath(image)}" alt="${title}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />
+                ${video
+                  ? `<video class="work-video-preview" data-src="${assetPath(video)}" poster="${assetPath(image)}" muted loop playsinline preload="none" aria-hidden="true"></video>`
+                  : `<img src="${assetPath(image)}" alt="${title}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />`}
               </button>
               <p>${title}</p>
             </article>`,
@@ -382,6 +384,26 @@ if (page === "work") {
   const videoStatus = videoDialog.querySelector(".video-lightbox-status");
   let activeIndex = 0;
 
+  const previewObserver = new IntersectionObserver((entries) => {
+    entries.forEach(({ target: preview, isIntersecting }) => {
+      if (isIntersecting) {
+        const source = preview.dataset.src;
+        preview.muted = true;
+        preview.src = source;
+        preview.play().catch((error) => {
+          if (preview.getAttribute("src") === source) {
+            console.error(`Unable to play work preview "${source}".`, error);
+          }
+        });
+      } else {
+        preview.pause();
+        preview.removeAttribute("src");
+        preview.load();
+      }
+    });
+  });
+  document.querySelectorAll(".work-video-preview").forEach((preview) => previewObserver.observe(preview));
+
   function showWork(index) {
     activeIndex = (index + works.length) % works.length;
     const work = works[activeIndex];
@@ -409,9 +431,7 @@ if (page === "work") {
     });
   });
 
-  dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) dialog.close();
-  });
+  dialog.addEventListener("click", () => dialog.close());
   dialog.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();

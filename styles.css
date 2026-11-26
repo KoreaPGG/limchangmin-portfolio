@@ -185,7 +185,8 @@ button {
   cursor: zoom-in;
 }
 
-.work-image-button img {
+.work-image-button img,
+.work-image-button video {
   display: block;
   width: 100%;
   height: 100%;
@@ -198,8 +199,15 @@ button {
 }
 
 .work-image-button:hover img,
-.work-image-button:focus-visible img {
+.work-image-button:focus-visible img,
+.work-image-button:hover video,
+.work-image-button:focus-visible video {
   transform: scale(1.025);
+}
+
+.work-video-preview::-webkit-media-controls-start-playback-button {
+  display: none;
+  -webkit-appearance: none;
 }
 
 .work-card p {
