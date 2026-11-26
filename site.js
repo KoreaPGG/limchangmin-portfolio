@@ -178,7 +178,8 @@ function footer() {
 
 function renderHome() {
   return `<main class="hero" aria-label="Lim Changmin">
-    <div class="hero-image" role="img" aria-label="A landscape framed by architecture"></div>
+    <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <button class="hero-retry" type="button" hidden>배경 영상 재생</button>
   </main>`;
 }
 
@@ -317,6 +318,64 @@ const pageContent = {
 };
 
 app.innerHTML = `${header()}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
+
+if (page === "home") {
+  const homeVideos = [
+    "home-videos/work-003.mp4",
+    "home-videos/work-005.mp4",
+    "home-videos/work-045.mp4",
+    "home-videos/work-060.mp4",
+    "home-videos/work-065.mp4",
+  ];
+  const video = document.querySelector(".hero-video");
+  const retry = document.querySelector(".hero-retry");
+  let lastVideo;
+
+  function playVideo() {
+    const source = video.getAttribute("src");
+    video.play().catch((error) => {
+      if (video.getAttribute("src") !== source) return;
+      console.error("Unable to play the home background video.", error);
+      retry.hidden = false;
+    });
+  }
+
+  function chooseVideo() {
+    try {
+      lastVideo = sessionStorage.getItem("home-video") || lastVideo;
+    } catch (error) {
+      console.warn("Unable to read the previous home video.", error);
+    }
+
+    const choices = homeVideos.filter((source) => source !== lastVideo);
+    lastVideo = choices[Math.floor(Math.random() * choices.length)];
+    try {
+      sessionStorage.setItem("home-video", lastVideo);
+    } catch (error) {
+      console.warn("Unable to remember the home video.", error);
+    }
+
+    retry.hidden = true;
+    video.src = assetPath(lastVideo);
+    video.load();
+    playVideo();
+  }
+
+  retry.addEventListener("click", playVideo);
+  video.addEventListener("playing", () => {
+    retry.hidden = true;
+  });
+  video.addEventListener("error", () => {
+    if (video.currentSrc) {
+      console.error("Unable to load the home background video.", video.error);
+      retry.hidden = false;
+    }
+  });
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) chooseVideo();
+  });
+  chooseVideo();
+}
 
 if (page === "work") {
   const dialog = document.querySelector(".work-lightbox");
