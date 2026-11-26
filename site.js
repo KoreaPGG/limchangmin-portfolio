@@ -324,7 +324,7 @@ if (page === "home") {
     "home-videos/work-003.mp4",
     "home-videos/work-005.mp4",
     "home-videos/work-045.mp4",
-    "home-videos/work-060.mp4",
+    "home-videos/work-016.mp4",
     "home-videos/work-065.mp4",
   ];
   const video = document.querySelector(".hero-video");
