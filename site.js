@@ -169,16 +169,36 @@ function renderAbout() {
 }
 
 function renderPress() {
-  const items = window.sortPressItemsByDate(siteContent.press.items)
-    .map(({ title, date, url }) => {
+  const groups = new Map();
+  window.sortPressItemsByDate(siteContent.press.items).forEach((item) => {
+    const date = String(item.date ?? "");
+    const yearMatch = /^\s*(\d{4})(?:\D|$)/.exec(date);
+    const year = yearMatch ? yearMatch[1] : "기타";
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year).push(item);
+  });
+
+  const yearSections = Array.from(groups, ([year, items]) => {
+    const entries = items.map(({ title, date, url }) => {
       const safeUrl = safeExternalUrl(url);
+      const parts = /^\s*(\d{4})\D+(\d{1,2})\D+(\d{1,2})\s*$/.exec(String(date ?? ""));
+      const isoDate = parts ? `${parts[1]}-${parts[2].padStart(2, "0")}-${parts[3].padStart(2, "0")}` : "";
+      const displayDate = parts
+        ? `${parts[1]}. ${parts[2].padStart(2, "0")}. ${parts[3].padStart(2, "0")}`
+        : escapeHtml(date);
       return `<li class="press-item">
         ${safeUrl ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noreferrer">${escapeHtml(title)}</a>` : escapeHtml(title)}
-        <time>${escapeHtml(date)}</time>
+        ${parts ? `<time datetime="${isoDate}">${displayDate}</time>` : `<time>${displayDate}</time>`}
       </li>`;
     }).join("");
+    return `<section class="press-year" aria-labelledby="press-year-${escapeHtml(year)}">
+      <h2 id="press-year-${escapeHtml(year)}">${escapeHtml(year)}</h2>
+      <ul class="press-list">${entries}</ul>
+    </section>`;
+  }).join("");
+
   return `<main class="press-page page-content">
-    <ul class="press-list">${items}</ul>
+    ${yearSections}
   </main>`;
 }
 

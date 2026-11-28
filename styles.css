@@ -438,6 +438,24 @@ button {
   padding-bottom: 125px;
 }
 
+.press-year {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.press-year + .press-year {
+  margin-top: 28px;
+}
+
+.press-year h2 {
+  margin: 16px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .press-list {
   margin: 0;
   padding: 0;
@@ -652,6 +670,19 @@ button {
 
   .about-section {
     padding-top: 60px;
+  }
+
+  .press-year {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .press-year + .press-year {
+    margin-top: 20px;
+  }
+
+  .press-year h2 {
+    margin: 16px 0 4px;
   }
 
   .press-item {

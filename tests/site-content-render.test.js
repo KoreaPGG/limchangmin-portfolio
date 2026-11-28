@@ -100,6 +100,19 @@ test("Press renders newest items first across supported date formats", async () 
   assert.ok(html.indexOf("Older item") < html.indexOf("Undated item"));
 });
 
+test("Press groups items by year and normalizes date display", async () => {
+  const html = await render("press", {
+    items: [
+      { title: "Earlier year", date: "2025-07-14", url: "https://example.com/2025" },
+      { title: "Later year", date: "2026-05-08", url: "https://example.com/2026" },
+    ],
+  });
+
+  assert.match(html, /<section class="press-year"[^>]*>[\s\S]*<h2[^>]*>2026<\/h2>/);
+  assert.ok(html.indexOf(">2026</h2>") < html.indexOf(">2025</h2>"));
+  assert.match(html, /<time datetime="2026-05-08">2026\. 05\. 08<\/time>/);
+});
+
 test("Work renders saved Exhibition Views captions as escaped text", async () => {
   const html = await render("work", {
     title: "Exhibition Views",
