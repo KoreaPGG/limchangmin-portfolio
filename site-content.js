@@ -107,3 +107,18 @@ window.portfolioContentDefaults = {
     ],
   },
 };
+
+window.sortPressItemsByDate = (items) => {
+  const dateOrder = (value) => {
+    const match = /^\s*(\d{4})\D+(\d{1,2})\D+(\d{1,2})\s*$/.exec(String(value ?? ""));
+    if (!match) return 0;
+    const [, year, month, day] = match.map(Number);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return 0;
+    return year * 10000 + month * 100 + day;
+  };
+
+  return (Array.isArray(items) ? items : [])
+    .map((item, index) => ({ item, index, date: dateOrder(item.date) }))
+    .sort((a, b) => b.date - a.date || a.index - b.index)
+    .map(({ item }) => item);
+};

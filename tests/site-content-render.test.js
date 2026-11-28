@@ -87,6 +87,19 @@ test("Press ignores unsafe saved URLs while keeping the item title", async () =>
   assert.doesNotMatch(item, /href=/);
 });
 
+test("Press renders newest items first across supported date formats", async () => {
+  const html = await render("press", {
+    items: [
+      { title: "Older item", date: "2018. 03. 15", url: "https://example.com/old" },
+      { title: "Newer item", date: "2026-05-08", url: "https://example.com/new" },
+      { title: "Undated item", date: "date unknown", url: "https://example.com/unknown" },
+    ],
+  });
+
+  assert.ok(html.indexOf("Newer item") < html.indexOf("Older item"));
+  assert.ok(html.indexOf("Older item") < html.indexOf("Undated item"));
+});
+
 test("Work renders saved Exhibition Views captions as escaped text", async () => {
   const html = await render("work", {
     title: "Exhibition Views",

@@ -12,6 +12,7 @@ const contentPanel = document.querySelector("#content-panel");
 const contentPage = document.querySelector("#content-page");
 const contentForm = document.querySelector("#content-form");
 const contentFields = document.querySelector("#content-fields");
+const contentDraftState = document.querySelector("#content-draft-state");
 let token = null;
 let works = [];
 let contentDrafts = {};
@@ -20,6 +21,12 @@ let contentDirty = false;
 
 function message(text) {
   status.textContent = text;
+}
+
+function setContentDirty(dirty) {
+  contentDirty = dirty;
+  contentDraftState.textContent = dirty ? "저장되지 않은 변경사항" : "변경사항 없음";
+  contentDraftState.classList.toggle("is-dirty", dirty);
 }
 
 function escapeHtml(value) {
@@ -72,41 +79,24 @@ function contentRow(type, item = "", number = 1) {
 }
 
 function contentList(key, label, type, items) {
+  const orderedItems = type === "press" ? window.sortPressItemsByDate(items) : items;
   return `<fieldset class="content-group">
     <legend>${label}</legend>
-    <div class="content-list" data-list="${key}" data-type="${type}">${items.map((item, index) => contentRow(type, item, index + 1)).join("")}</div>
     <button type="button" data-add-list="${key}">항목 추가</button>
+    <div class="content-list" data-list="${key}" data-type="${type}">${orderedItems.map((item, index) => contentRow(type, item, index + 1)).join("")}</div>
   </fieldset>`;
 }
 
 function renderContentForm(pageKey, content) {
   if (pageKey === "exhibition") {
-    return `<h2>Work — Exhibition Views</h2>
+    return `<h2>Exhibition Views</h2>
       ${settingField("섹션 제목", "title", content.title)}
       <p>사진을 삭제하면 웹사이트 목록에서만 사라집니다. 업로드된 원본 파일은 저장소에 보관됩니다.</p>
       ${contentList("items", "전시장 사진", "photo", content.items)}`;
   }
   if (pageKey === "about") {
-    const headings = content.headings;
     return `<h2>About</h2>
-      ${settingField("이름", "name", content.name)}
-      <fieldset class="content-group">
-        <legend>프로필 사진</legend>
-        <img class="content-image-preview content-portrait-preview" src="${escapeHtml(store.assetPath(content.portrait))}" alt="" />
-        <input type="hidden" data-setting="portrait" value="${escapeHtml(content.portrait)}" />
-        <label>새 사진 업로드 <input type="file" data-file="portrait" accept="image/*" /></label>
-      </fieldset>
       ${contentList("biography", "소개 문단", "text", content.biography)}
-      <fieldset class="content-group">
-        <legend>섹션 제목</legend>
-        ${settingField("탭: About", "headings.navAbout", headings.navAbout)}
-        ${settingField("탭: Exhibitions", "headings.navExhibitions", headings.navExhibitions)}
-        ${settingField("탭: Current", "headings.navCurrent", headings.navCurrent)}
-        ${settingField("개인전 제목", "headings.soloExhibitions", headings.soloExhibitions)}
-        ${settingField("그룹전 제목", "headings.groupExhibitions", headings.groupExhibitions)}
-        ${settingField("학력 제목", "headings.education", headings.education)}
-        ${settingField("현재 제목", "headings.current", headings.current)}
-      </fieldset>
       ${contentList("soloExhibitions", "개인전", "exhibition", content.soloExhibitions)}
       ${contentList("groupExhibitions", "그룹전", "exhibition", content.groupExhibitions)}
       ${contentList("education", "학력", "text", content.education)}
@@ -196,7 +186,7 @@ function settingValue(key) {
 function renderLoadedContent(pageKey, content) {
   contentFields.innerHTML = renderContentForm(pageKey, content);
   contentForm.querySelector('[type="submit"]').disabled = false;
-  contentDirty = false;
+  setContentDirty(false);
 }
 
 async function loadContentPage(pageKey, force = false) {
@@ -243,21 +233,11 @@ async function readPageContent(pageKey) {
     return { title, items };
   }
   if (pageKey === "about") {
-    const portrait = await uploadImageIfSelected(
-      contentFields.querySelector('[data-file="portrait"]').files[0],
-      settingValue("portrait"),
-    );
-    const headings = Object.fromEntries(
-      Object.keys(window.portfolioContentDefaults.about.headings).map((key) => [key, settingValue(`headings.${key}`)]),
-    );
-    if (!settingValue("name") || Object.values(headings).some((value) => !value)) {
-      throw new Error("이름과 섹션 제목을 모두 입력해주세요.");
-    }
+    const existing = contentDrafts.about;
+    if (!existing) throw new Error("About 페이지 내용을 먼저 불러와주세요.");
     return {
-      name: settingValue("name"),
-      portrait,
+      ...existing,
       biography: readContentRows("biography", "text").filter(Boolean),
-      headings,
       soloExhibitions: readContentRows("soloExhibitions", "exhibition"),
       groupExhibitions: readContentRows("groupExhibitions", "exhibition"),
       education: readContentRows("education", "text").filter(Boolean),
@@ -279,7 +259,7 @@ function moveContentRow(button) {
     list.insertBefore(row.nextElementSibling, row);
   }
   refreshRowNumbers(list);
-  contentDirty = true;
+  setContentDirty(true);
 }
 
 function setContentBusy(busy) {
@@ -333,7 +313,7 @@ editorTabs.addEventListener("click", async (event) => {
   if (panelId === "work-panel" && contentDirty) {
     if (!window.confirm("저장하지 않은 페이지 변경사항을 버리시겠습니까?")) return;
     delete contentDrafts[currentContentPage];
-    contentDirty = false;
+    setContentDirty(false);
   }
   workPanel.hidden = panelId !== "work-panel";
   contentPanel.hidden = panelId !== "content-panel";
@@ -352,16 +332,16 @@ contentPage.addEventListener("change", async () => {
     delete contentDrafts[currentContentPage];
   }
   currentContentPage = contentPage.value;
-  contentDirty = false;
+  setContentDirty(false);
   await loadContentPage(currentContentPage);
 });
 
 contentFields.addEventListener("input", () => {
-  contentDirty = true;
+  setContentDirty(true);
 });
 
 contentFields.addEventListener("change", () => {
-  contentDirty = true;
+  setContentDirty(true);
 });
 
 contentFields.addEventListener("click", (event) => {
@@ -376,8 +356,9 @@ contentFields.addEventListener("click", (event) => {
       press: { title: "", date: "", url: "" },
       photo: { image: "", caption: "" },
     };
-    list.insertAdjacentHTML("beforeend", contentRow(type, blankItems[type], list.children.length + 1));
-    contentDirty = true;
+    list.insertAdjacentHTML("afterbegin", contentRow(type, blankItems[type], 1));
+    refreshRowNumbers(list);
+    setContentDirty(true);
     return;
   }
   const rowAction = event.target.closest("[data-row-action]");
@@ -481,7 +462,7 @@ logout.addEventListener("click", async () => {
     token = null;
     works = [];
     contentDrafts = {};
-    contentDirty = false;
+    setContentDirty(false);
     contentFields.replaceChildren();
     contentPage.value = "exhibition";
     currentContentPage = "exhibition";

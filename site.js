@@ -169,7 +169,7 @@ function renderAbout() {
 }
 
 function renderPress() {
-  const items = (Array.isArray(siteContent.press.items) ? siteContent.press.items : [])
+  const items = window.sortPressItemsByDate(siteContent.press.items)
     .map(({ title, date, url }) => {
       const safeUrl = safeExternalUrl(url);
       return `<li class="press-item">
