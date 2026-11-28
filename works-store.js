@@ -47,7 +47,7 @@
     if (path.startsWith("supabase:")) {
       return `${baseUrl}/storage/v1/object/public/work-media/${path.slice(9).split("/").map(encodeURIComponent).join("/")}`;
     }
-    return `./assets/${path}`;
+    return `/assets/${path}`;
   }
 
   window.worksStore = {

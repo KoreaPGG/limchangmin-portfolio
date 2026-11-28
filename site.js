@@ -137,8 +137,8 @@ const pressItems = [
 
 const page = document.body.dataset.page || "home";
 const app = document.querySelector("#app");
-const assetPath = (filename) => window.worksStore ? window.worksStore.assetPath(filename) : `./assets/${filename}`;
-const pagePath = (name) => `./${name}.html`;
+const assetPath = (filename) => window.worksStore ? window.worksStore.assetPath(filename) : `/assets/${filename}`;
+const pagePath = (name) => `/${name}/`;
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[character]);
@@ -159,7 +159,7 @@ function header() {
       <a href="${pagePath("about")}"${active === "about" ? ' aria-current="page"' : ""}>About</a>
       <a href="${pagePath("press")}"${active === "press" ? ' aria-current="page"' : ""}>Press</a>
     </nav>
-    <a class="site-title" href="./index.html" aria-label="Lim Changmin home">Lim Changmin</a>
+    <a class="site-title" href="/" aria-label="Lim Changmin home">Lim Changmin</a>
     <a class="instagram-link" href="${instagramUrl}" target="_blank" rel="noreferrer" aria-label="Instagram">
       ${instagramIcon()}
     </a>
