@@ -1,7 +1,7 @@
 const instagramUrl =
   "https://www.instagram.com/lim_changmin_official?igsh=Njd5ajR2eG5kZDli&igsi=Njd5ajR2eG5kZDli";
 
-const works = window.portfolioWorks;
+let works = window.portfolioWorks;
 
 const exhibitionPhotos = [
   "Jeju Museum of Art, 2021",
@@ -137,8 +137,11 @@ const pressItems = [
 
 const page = document.body.dataset.page || "home";
 const app = document.querySelector("#app");
-const assetPath = (filename) => `./assets/${filename}`;
+const assetPath = (filename) => window.worksStore ? window.worksStore.assetPath(filename) : `./assets/${filename}`;
 const pagePath = (name) => `./${name}.html`;
+const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+})[character]);
 
 function instagramIcon() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -171,7 +174,7 @@ function footer() {
     <div class="footer-details">
       <a href="${instagramUrl}" target="_blank" rel="noreferrer">@lim_changmin_official</a>
       <p>대구광역시 남구 명덕로 104</p>
-      <a href="mailto:limchangmin@gmail.com">limchangmin@gmail.com</a>
+      <a href="mailto:nyapril@naver.com">nyapril@naver.com</a>
     </div>
   </footer>`;
 }
@@ -196,12 +199,12 @@ function renderWork() {
         <div class="work-grid">${yearWorks
           .map(
             ({ title, image, video, previewScale, index }) => `<article class="work-card">
-              <button class="work-image-button${video ? " work-image-button--video" : ""}" type="button" data-work-index="${index}" aria-label="${video ? "Play video" : "View artwork"}: ${title}">
+              <button class="work-image-button${video ? " work-image-button--video" : ""}" type="button" data-work-index="${index}" aria-label="${video ? "Play video" : "View artwork"}: ${escapeHtml(title)}">
                 ${video
-                  ? `<video class="work-video-preview" data-src="${assetPath(video)}" poster="${assetPath(image)}"${previewScale ? ` style="--preview-scale: ${previewScale}"` : ""} muted loop playsinline preload="none" aria-hidden="true"></video>`
-                  : `<img src="${assetPath(image)}" alt="${title}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />`}
+                  ? `<video class="work-video-preview" data-src="${escapeHtml(assetPath(video))}" poster="${escapeHtml(assetPath(image))}"${previewScale ? ` style="--preview-scale: ${Number(previewScale)}"` : ""} muted loop playsinline preload="none" aria-hidden="true"></video>`
+                  : `<img src="${escapeHtml(assetPath(image))}" alt="${escapeHtml(title)}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />`}
               </button>
-              <p>${title}</p>
+              <p>${escapeHtml(title)}</p>
             </article>`,
           )
           .join("")}</div>
@@ -248,7 +251,7 @@ function renderAbout() {
   return `<main class="about-layout page-content">
     <nav class="about-index" aria-label="About sections">
       <a href="#about">about</a>
-      <a href="#history">history</a>
+      <a href="#exhibitions">exhibitions</a>
       <a href="#current">current</a>
     </nav>
     <div class="about-content">
@@ -262,7 +265,8 @@ function renderAbout() {
           <p>In recent years, he has collaborated with major organizations and corporations, including LG, ACE Bed, POSCO, GS Caltex, and Incheon International Airport, producing a wide range of public art and media art projects.</p>
         </div>
       </section>
-      <section id="history" class="about-section">
+      <section id="exhibitions" class="about-section">
+        <span id="history"></span>
         <h2>Selected Solo Exhibitions</h2>
         ${exhibitionList(soloExhibitions)}
         <h2 class="group-heading">Selected Group Exhibitions</h2>
@@ -316,7 +320,17 @@ const pageContent = {
   press: renderPress,
 };
 
-app.innerHTML = `${header()}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
+async function initializeSite() {
+let loadError = false;
+if (page === "work" && window.worksStore.configured) {
+  try {
+    works = await window.worksStore.list();
+  } catch (error) {
+    console.error("Unable to load updated works.", error);
+    loadError = true;
+  }
+}
+app.innerHTML = `${header()}${loadError ? '<p role="alert">최신 작업물을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</p>' : ""}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
 
 if (page === "home") {
   // Content bounds in 480×270 frames, excluding borders baked into the videos.
@@ -478,3 +492,6 @@ if (page === "work") {
     if (videoPlayer.currentSrc) videoStatus.textContent = "영상을 불러오지 못했습니다.";
   });
 }
+}
+
+initializeSite();

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>작업물 관리</title>
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="./works-data.js" defer></script>
+    <script src="./supabase-config.js" defer></script>
+    <script src="./works-store.js" defer></script>
+    <script src="./admin.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>작업물 관리</h1>
+      <p><a href="./work.html">공개 페이지 보기</a></p>
+      <p id="status" role="status" aria-live="polite"></p>
+      <form id="login">
+        <label>이메일 <input name="email" type="email" autocomplete="username" required /></label>
+        <label>비밀번호 <input name="password" type="password" autocomplete="current-password" required /></label>
+        <button type="submit">로그인</button>
+      </form>
+      <section id="editor" hidden>
+        <button id="logout" type="button">로그아웃</button>
+        <label>작업물 선택 <select id="work-select"></select></label>
+        <form id="work-form">
+          <label>제목 <input name="title" maxlength="300" required /></label>
+          <label>연도 <input name="year" type="number" min="1" max="9999" required /></label>
+          <label>이미지 <input name="image" type="file" accept="image/*" /></label>
+          <p id="image-info"></p>
+          <label>동영상 <input name="video" type="file" accept="video/*" /></label>
+          <p id="video-info"></p>
+          <label><input name="removeVideo" type="checkbox" /> 기존 동영상 제거</label>
+          <button type="submit">저장</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

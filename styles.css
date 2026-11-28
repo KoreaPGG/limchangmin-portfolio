@@ -66,7 +66,6 @@ button {
   transition: opacity 160ms ease;
 }
 
-.primary-nav a:hover,
 .primary-nav a[aria-current="page"] {
   font-weight: 700;
 }
@@ -240,7 +239,8 @@ button {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
-  gap: 30px;
+  column-gap: 30px;
+  row-gap: 28px;
 }
 
 .exhibition-photo {
@@ -251,7 +251,8 @@ button {
 .exhibition-photo img {
   display: block;
   width: 100%;
-  height: auto;
+  aspect-ratio: 265.5 / 200;
+  object-fit: cover;
 }
 
 .exhibition-photo figcaption {
@@ -569,6 +570,7 @@ button {
 
   .exhibition-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 48px;
   }
 
   .work-card p {
@@ -576,7 +578,7 @@ button {
   }
 
   .about-layout {
-    grid-template-columns: 40px minmax(0, 357px);
+    grid-template-columns: max-content minmax(0, 357px);
     gap: 26px;
     padding: 0 64px 140px;
   }
@@ -640,7 +642,8 @@ button {
 
   .exhibition-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 30px 20px;
+    column-gap: 30.5px;
+    row-gap: 46px;
   }
 
   .work-card p {
@@ -648,9 +651,9 @@ button {
   }
 
   .about-layout {
-    grid-template-columns: 40px minmax(0, 1fr);
-    gap: 20px;
-    padding: 0 30px 140px 44px;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 12px;
+    padding: 0 20px 140px;
   }
 
   .about-content {
