@@ -122,6 +122,35 @@ button {
   pointer-events: none;
 }
 
+.hero-skeleton {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(108deg, #293f4f 8%, #405a6b 18%, #293f4f 33%);
+  background-size: 200% 100%;
+  animation: hero-skeleton-shimmer 1.4s linear infinite;
+  opacity: 1;
+  transition: opacity 260ms ease;
+  pointer-events: none;
+}
+
+.hero--video-ready .hero-skeleton {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes hero-skeleton-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-skeleton {
+    animation: none;
+  }
+}
+
 .hero::after {
   position: absolute;
   inset: 0;

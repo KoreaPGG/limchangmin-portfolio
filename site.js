@@ -182,6 +182,7 @@ function footer() {
 function renderHome() {
   return `<main class="hero" aria-label="Lim Changmin">
     <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <div class="hero-skeleton" aria-hidden="true"></div>
     <button class="hero-retry" type="button" hidden>배경 영상 재생</button>
   </main>`;
 }
@@ -336,13 +337,14 @@ app.innerHTML = `${header()}${loadError ? '<p role="alert">최신 작업물을 �
 if (page === "home") {
   // Content bounds in 480×270 frames, excluding borders baked into the videos.
   const homeVideos = [
-    { source: "home-videos/work-003.mp4?v=3", poster: "work-gallery/work-003.webp", bounds: [45, 3, 391, 264] },
-    { source: "home-videos/work-005.mp4?v=3", poster: "work-gallery/work-005.webp", bounds: [36, 8, 412, 250] },
-    { source: "home-videos/work-045.mp4?v=3", poster: "work-gallery/work-045.webp", bounds: [42, 2, 397, 266] },
-    { source: "home-videos/work-016.mp4?v=3", poster: "work-gallery/work-016.webp", bounds: [39, 2, 403, 268] },
-    { source: "home-videos/work-065.mp4?v=3", poster: "work-gallery/work-065.webp", bounds: [37, 0, 406, 270] },
+    { source: "home-videos/work-003.mp4?v=3", bounds: [45, 3, 391, 264] },
+    { source: "home-videos/work-005.mp4?v=3", bounds: [36, 8, 412, 250] },
+    { source: "home-videos/work-045.mp4?v=3", bounds: [42, 2, 397, 266] },
+    { source: "home-videos/work-016.mp4?v=3", bounds: [39, 2, 403, 268] },
+    { source: "home-videos/work-065.mp4?v=3", bounds: [37, 0, 406, 270] },
   ];
   const video = document.querySelector(".hero-video");
+  const hero = video.closest(".hero");
   const retry = document.querySelector(".hero-retry");
   let lastVideo;
   let currentVideo;
@@ -384,8 +386,8 @@ if (page === "home") {
     }
 
     retry.hidden = true;
+    hero.classList.remove("hero--video-ready");
     updateVideoScale();
-    video.poster = assetPath(currentVideo.poster);
     video.src = assetPath(lastVideo);
     video.load();
     playVideo();
@@ -393,6 +395,7 @@ if (page === "home") {
 
   retry.addEventListener("click", playVideo);
   video.addEventListener("playing", () => {
+    hero.classList.add("hero--video-ready");
     retry.hidden = true;
   });
   video.addEventListener("error", () => {
