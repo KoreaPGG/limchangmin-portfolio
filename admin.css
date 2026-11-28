@@ -1,8 +1,121 @@
-* { box-sizing: border-box; }
-body { margin: 0; font: 16px/1.5 sans-serif; color: #222; background: #f7f7f7; }
-main { max-width: 640px; margin: 2rem auto; padding: 1.5rem; background: white; }
-label { display: block; margin: 1rem 0; }
-input:not([type="checkbox"]), select { display: block; width: 100%; padding: 0.6rem; margin-top: 0.3rem; }
-button { padding: 0.6rem 1rem; cursor: pointer; }
-#status { white-space: pre-wrap; overflow-wrap: anywhere; }
-[hidden] { display: none !important; }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f7f7;
+  color: #222;
+  font: 16px/1.5 sans-serif;
+}
+
+main {
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+}
+
+label {
+  display: block;
+  margin: 1rem 0;
+}
+
+input:not([type="checkbox"]),
+select,
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  min-height: 40px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+}
+
+#status {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+#editor-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+#editor-tabs button[aria-pressed="true"] {
+  background: #222;
+  color: #fff;
+}
+
+.content-group {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid #d5d5d5;
+}
+
+.content-group > legend {
+  padding: 0 0.4rem;
+  font-weight: 700;
+}
+
+.content-row {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #e4e4e4;
+  background: #fafafa;
+}
+
+.content-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.content-row-actions span {
+  flex: 1;
+  font-weight: 700;
+}
+
+.content-image-preview {
+  display: block;
+  max-width: 240px;
+  max-height: 180px;
+  margin: 0.5rem 0;
+  object-fit: contain;
+}
+
+.content-portrait-preview {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin: 0;
+    padding: 1rem;
+  }
+
+  .content-row-actions {
+    flex-wrap: wrap;
+  }
+}

@@ -6,11 +6,155 @@ const select = document.querySelector("#work-select");
 const form = document.querySelector("#work-form");
 const logout = document.querySelector("#logout");
 const deleteWork = document.querySelector("#delete-work");
+const editorTabs = document.querySelector("#editor-tabs");
+const workPanel = document.querySelector("#work-panel");
+const contentPanel = document.querySelector("#content-panel");
+const contentPage = document.querySelector("#content-page");
+const contentForm = document.querySelector("#content-form");
+const contentFields = document.querySelector("#content-fields");
 let token = null;
 let works = [];
+let contentDrafts = {};
+let currentContentPage = contentPage.value;
+let contentDirty = false;
 
 function message(text) {
   status.textContent = text;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[character]);
+}
+
+function mergeDefaults(defaults, saved) {
+  if (Array.isArray(defaults)) return Array.isArray(saved) ? saved : defaults;
+  if (defaults && typeof defaults === "object") {
+    const source = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+    return Object.fromEntries(Object.entries(defaults).map(([key, value]) => [key, mergeDefaults(value, source[key])]));
+  }
+  return typeof saved === typeof defaults ? saved : defaults;
+}
+
+function settingField(label, key, value, type = "text") {
+  return `<label>${label}<input type="${type}" data-setting="${key}" value="${escapeHtml(value)}" /></label>`;
+}
+
+function textAreaField(label, key, value) {
+  return `<label>${label}<textarea data-setting="${key}" rows="4">${escapeHtml(value)}</textarea></label>`;
+}
+
+function contentRow(type, item = "", number = 1) {
+  const actions = `<div class="content-row-actions">
+    <span>항목 ${number}</span>
+    <button type="button" data-row-action="up" aria-label="위로 이동">↑</button>
+    <button type="button" data-row-action="down" aria-label="아래로 이동">↓</button>
+    <button type="button" data-row-action="remove">삭제</button>
+  </div>`;
+  let fields;
+  if (type === "text") {
+    fields = textAreaField("내용", "value", item);
+  } else if (type === "exhibition") {
+    fields = `${settingField("연도", "year", item.year, "number")}${textAreaField("전시명 및 장소", "title", item.title)}`;
+  } else if (type === "current") {
+    fields = `${settingField("항목 제목", "heading", item.heading)}${textAreaField("내용 (한 줄에 하나씩)", "lines", (item.lines || []).join("\n"))}`;
+  } else if (type === "press") {
+    fields = `${textAreaField("제목", "title", item.title)}${settingField("날짜", "date", item.date)}${settingField("링크 (https://)", "url", item.url, "url")}`;
+  } else {
+    const imageUrl = item.image ? store.assetPath(item.image) : "";
+    fields = `<input type="hidden" data-field="image" value="${escapeHtml(item.image)}" />
+      ${imageUrl ? `<img class="content-image-preview" src="${escapeHtml(imageUrl)}" alt="" />` : ""}
+      <label>사진 파일 <input type="file" data-file="image" accept="image/*" /></label>
+      ${settingField("설명 / 캡션", "caption", item.caption)}`;
+  }
+  return `<fieldset class="content-row" data-row-type="${type}">${actions}${fields}</fieldset>`;
+}
+
+function contentList(key, label, type, items) {
+  return `<fieldset class="content-group">
+    <legend>${label}</legend>
+    <div class="content-list" data-list="${key}" data-type="${type}">${items.map((item, index) => contentRow(type, item, index + 1)).join("")}</div>
+    <button type="button" data-add-list="${key}">항목 추가</button>
+  </fieldset>`;
+}
+
+function renderContentForm(pageKey, content) {
+  if (pageKey === "exhibition") {
+    return `<h2>Work — Exhibition Views</h2>
+      ${settingField("섹션 제목", "title", content.title)}
+      <p>사진을 삭제하면 웹사이트 목록에서만 사라집니다. 업로드된 원본 파일은 저장소에 보관됩니다.</p>
+      ${contentList("items", "전시장 사진", "photo", content.items)}`;
+  }
+  if (pageKey === "about") {
+    const headings = content.headings;
+    return `<h2>About</h2>
+      ${settingField("이름", "name", content.name)}
+      <fieldset class="content-group">
+        <legend>프로필 사진</legend>
+        <img class="content-image-preview content-portrait-preview" src="${escapeHtml(store.assetPath(content.portrait))}" alt="" />
+        <input type="hidden" data-setting="portrait" value="${escapeHtml(content.portrait)}" />
+        <label>새 사진 업로드 <input type="file" data-file="portrait" accept="image/*" /></label>
+      </fieldset>
+      ${contentList("biography", "소개 문단", "text", content.biography)}
+      <fieldset class="content-group">
+        <legend>섹션 제목</legend>
+        ${settingField("탭: About", "headings.navAbout", headings.navAbout)}
+        ${settingField("탭: Exhibitions", "headings.navExhibitions", headings.navExhibitions)}
+        ${settingField("탭: Current", "headings.navCurrent", headings.navCurrent)}
+        ${settingField("개인전 제목", "headings.soloExhibitions", headings.soloExhibitions)}
+        ${settingField("그룹전 제목", "headings.groupExhibitions", headings.groupExhibitions)}
+        ${settingField("학력 제목", "headings.education", headings.education)}
+        ${settingField("현재 제목", "headings.current", headings.current)}
+      </fieldset>
+      ${contentList("soloExhibitions", "개인전", "exhibition", content.soloExhibitions)}
+      ${contentList("groupExhibitions", "그룹전", "exhibition", content.groupExhibitions)}
+      ${contentList("education", "학력", "text", content.education)}
+      ${contentList("current", "현재 소속 / 연락처 정보", "current", content.current)}`;
+  }
+  return `<h2>Press</h2>${contentList("items", "보도 및 영상 항목", "press", content.items)}`;
+}
+
+function refreshRowNumbers(list) {
+  list.querySelectorAll(".content-row-actions span").forEach((label, index) => {
+    label.textContent = `항목 ${index + 1}`;
+  });
+}
+
+function readContentRows(key, type) {
+  const list = contentFields.querySelector(`[data-list="${key}"]`);
+  return Array.from(list.querySelectorAll(".content-row"), (row) => {
+    const value = (name) => row.querySelector(`[data-field="${name}"]`)?.value.trim() || "";
+    if (type === "text") return value("value");
+    if (type === "exhibition") {
+      const year = value("year");
+      const title = value("title");
+      const numericYear = Number(year);
+      if (!Number.isInteger(numericYear) || numericYear < 1 || numericYear > 9999 || !title) {
+        throw new Error("전시 연도와 제목을 확인해주세요.");
+      }
+      return { year: numericYear, title };
+    }
+    if (type === "current") {
+      return { heading: value("heading"), lines: value("lines").split(/\r?\n/).map((line) => line.trim()).filter(Boolean) };
+    }
+    if (type === "press") {
+      const title = value("title");
+      const date = value("date");
+      const url = value("url");
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        throw new Error("Press 링크를 확인해주세요.");
+      }
+      if (!title || !date || !["http:", "https:"].includes(parsedUrl.protocol)) {
+        throw new Error("Press 제목, 날짜, http 또는 https 링크를 입력해주세요.");
+      }
+      return { title, date, url: parsedUrl.href };
+    }
+    return { image: value("image"), caption: value("caption"), file: row.querySelector('[data-file="image"]').files[0] };
+  });
 }
 
 function refreshSelection(selected = "") {
@@ -37,6 +181,116 @@ function setBusy(busy) {
   select.disabled = busy;
   logout.disabled = busy;
   deleteWork.disabled = busy;
+  contentPage.disabled = busy;
+  editorTabs.querySelectorAll("button").forEach((button) => {
+    button.disabled = busy;
+  });
+}
+
+function settingValue(key) {
+  const field = contentFields.querySelector(`[data-setting="${key}"]`);
+  if (!field) throw new Error("페이지 편집 항목을 찾지 못했습니다.");
+  return field.value.trim();
+}
+
+function renderLoadedContent(pageKey, content) {
+  contentFields.innerHTML = renderContentForm(pageKey, content);
+  contentForm.querySelector('[type="submit"]').disabled = false;
+  contentDirty = false;
+}
+
+async function loadContentPage(pageKey, force = false) {
+  const submit = contentForm.querySelector('[type="submit"]');
+  submit.disabled = true;
+  contentPage.disabled = true;
+  contentFields.replaceChildren();
+  if (contentDrafts[pageKey] && !force) {
+    renderLoadedContent(pageKey, contentDrafts[pageKey]);
+    contentPage.disabled = false;
+    return;
+  }
+  message("페이지 내용을 불러오는 중입니다...");
+  try {
+    const saved = await store.getContent(pageKey);
+    contentDrafts[pageKey] = mergeDefaults(window.portfolioContentDefaults[pageKey], saved);
+    renderLoadedContent(pageKey, contentDrafts[pageKey]);
+    message(saved ? "저장된 페이지 내용을 불러왔습니다." : "기본 페이지 내용입니다. 저장하면 공개 페이지에 반영됩니다.");
+  } catch (error) {
+    console.error(`Unable to load ${pageKey} content for editing.`, error);
+    contentFields.innerHTML = "<p>페이지 콘텐츠 테이블을 읽지 못했습니다. Supabase 마이그레이션 SQL을 실행했는지 확인해주세요.</p>";
+    message(`페이지 내용을 불러오지 못했습니다. ${error.message}`);
+  } finally {
+    contentPage.disabled = false;
+  }
+}
+
+async function uploadImageIfSelected(file, currentPath) {
+  if (!file) return currentPath;
+  if (!file.type.startsWith("image/")) throw new Error("이미지 파일을 선택해주세요.");
+  return store.upload(file, token);
+}
+
+async function readPageContent(pageKey) {
+  if (pageKey === "exhibition") {
+    const items = [];
+    for (const item of readContentRows("items", "photo")) {
+      const image = await uploadImageIfSelected(item.file, item.image);
+      if (!image) throw new Error("각 전시장 사진에 이미지 파일을 선택해주세요.");
+      items.push({ image, caption: item.caption });
+    }
+    const title = settingValue("title");
+    if (!title) throw new Error("섹션 제목을 입력해주세요.");
+    return { title, items };
+  }
+  if (pageKey === "about") {
+    const portrait = await uploadImageIfSelected(
+      contentFields.querySelector('[data-file="portrait"]').files[0],
+      settingValue("portrait"),
+    );
+    const headings = Object.fromEntries(
+      Object.keys(window.portfolioContentDefaults.about.headings).map((key) => [key, settingValue(`headings.${key}`)]),
+    );
+    if (!settingValue("name") || Object.values(headings).some((value) => !value)) {
+      throw new Error("이름과 섹션 제목을 모두 입력해주세요.");
+    }
+    return {
+      name: settingValue("name"),
+      portrait,
+      biography: readContentRows("biography", "text").filter(Boolean),
+      headings,
+      soloExhibitions: readContentRows("soloExhibitions", "exhibition"),
+      groupExhibitions: readContentRows("groupExhibitions", "exhibition"),
+      education: readContentRows("education", "text").filter(Boolean),
+      current: readContentRows("current", "current"),
+    };
+  }
+  return { items: readContentRows("items", "press") };
+}
+
+function moveContentRow(button) {
+  const row = button.closest(".content-row");
+  const list = row.parentElement;
+  const action = button.dataset.rowAction;
+  if (action === "remove") {
+    row.remove();
+  } else if (action === "up" && row.previousElementSibling) {
+    list.insertBefore(row, row.previousElementSibling);
+  } else if (action === "down" && row.nextElementSibling) {
+    list.insertBefore(row.nextElementSibling, row);
+  }
+  refreshRowNumbers(list);
+  contentDirty = true;
+}
+
+function setContentBusy(busy) {
+  contentPage.disabled = busy;
+  logout.disabled = busy;
+  editorTabs.querySelectorAll("button").forEach((button) => {
+    button.disabled = busy;
+  });
+  contentForm.querySelectorAll("input, textarea, button").forEach((control) => {
+    control.disabled = busy;
+  });
 }
 
 if (!store.configured) {
@@ -71,6 +325,84 @@ login.addEventListener("submit", async (event) => {
 });
 
 select.addEventListener("change", showSelection);
+
+editorTabs.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-panel]");
+  if (!button) return;
+  const panelId = button.dataset.panel;
+  if (panelId === "work-panel" && contentDirty) {
+    if (!window.confirm("저장하지 않은 페이지 변경사항을 버리시겠습니까?")) return;
+    delete contentDrafts[currentContentPage];
+    contentDirty = false;
+  }
+  workPanel.hidden = panelId !== "work-panel";
+  contentPanel.hidden = panelId !== "content-panel";
+  editorTabs.querySelectorAll("[data-panel]").forEach((tab) => {
+    tab.setAttribute("aria-pressed", String(tab === button));
+  });
+  if (panelId === "content-panel") await loadContentPage(currentContentPage);
+});
+
+contentPage.addEventListener("change", async () => {
+  if (contentDirty) {
+    if (!window.confirm("저장하지 않은 변경사항을 버리시겠습니까?")) {
+      contentPage.value = currentContentPage;
+      return;
+    }
+    delete contentDrafts[currentContentPage];
+  }
+  currentContentPage = contentPage.value;
+  contentDirty = false;
+  await loadContentPage(currentContentPage);
+});
+
+contentFields.addEventListener("input", () => {
+  contentDirty = true;
+});
+
+contentFields.addEventListener("change", () => {
+  contentDirty = true;
+});
+
+contentFields.addEventListener("click", (event) => {
+  const addButton = event.target.closest("[data-add-list]");
+  if (addButton) {
+    const list = contentFields.querySelector(`[data-list="${addButton.dataset.addList}"]`);
+    const type = list.dataset.type;
+    const blankItems = {
+      text: "",
+      exhibition: { year: "", title: "" },
+      current: { heading: "", lines: [] },
+      press: { title: "", date: "", url: "" },
+      photo: { image: "", caption: "" },
+    };
+    list.insertAdjacentHTML("beforeend", contentRow(type, blankItems[type], list.children.length + 1));
+    contentDirty = true;
+    return;
+  }
+  const rowAction = event.target.closest("[data-row-action]");
+  if (rowAction) moveContentRow(rowAction);
+});
+
+contentForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setContentBusy(true);
+  message("페이지 내용을 저장 중입니다...");
+  try {
+    const pageKey = contentPage.value;
+    const content = await readPageContent(pageKey);
+    await store.saveContent(pageKey, content, token);
+    contentDrafts[pageKey] = content;
+    renderLoadedContent(pageKey, content);
+    message("저장했습니다. 공개 페이지에 반영됩니다.");
+  } catch (error) {
+    console.error("Unable to save page content.", error);
+    message(`페이지 내용을 저장하지 못했습니다. ${error.message}`);
+  } finally {
+    setContentBusy(false);
+    contentForm.querySelector('[type="submit"]').disabled = false;
+  }
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -148,6 +480,16 @@ logout.addEventListener("click", async () => {
   } finally {
     token = null;
     works = [];
+    contentDrafts = {};
+    contentDirty = false;
+    contentFields.replaceChildren();
+    contentPage.value = "exhibition";
+    currentContentPage = "exhibition";
+    workPanel.hidden = false;
+    contentPanel.hidden = true;
+    editorTabs.querySelectorAll("[data-panel]").forEach((tab) => {
+      tab.setAttribute("aria-pressed", String(tab.dataset.panel === "work-panel"));
+    });
     editor.hidden = true;
     login.hidden = false;
     form.reset();

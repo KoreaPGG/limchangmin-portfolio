@@ -3,145 +3,22 @@ const instagramUrl =
 
 let works = [...window.portfolioWorks].sort((a, b) => b.year - a.year);
 
-const exhibitionPhotos = [
-  "Jeju Museum of Art, 2021",
-  "George Rogers Park, 2020",
-  "Art Miami, view 06",
-  "Art Miami, view 07",
-  "Art Miami, view 08",
-  "Exhibition installation view",
-  "Abu Dhabi Art, 2018",
-  "Art fair installation, view 002",
-  "Art fair installation, view 004",
-  "Art fair installation, view 005",
-  "Art fair installation, view 006",
-  "Art fair installation, view 007",
-  "Artside Gallery, view 001",
-  "Artside Gallery, view 002",
-  "GS Caltex Yeulmaru Museum, view 001",
-  "GS Caltex Yeulmaru Museum, view 002",
-  "GS Caltex Yeulmaru Museum, view 003",
-  "GS Caltex Yeulmaru Museum, view 004",
-  "GS Caltex Yeulmaru Museum, view 005",
-  "Incheon International Airport installation",
-  "Exhibition overview",
-  "Jeju Museum of Art exhibition",
-  "POSCO THE SHARP Gallery, view 001",
-  "POSCO THE SHARP Gallery, view 002",
-  "POSCO THE SHARP Gallery, view 003",
-];
-
-const soloExhibitions = [
-  ["2026", ["Homage to Park Dong Jun 2026, Gallery Bundo, Daegu, Korea"]],
-  ["2025", ["Eternal Seasons, The Trinity Gallery, Seoul, Korea"]],
-  [
-    "2024",
-    [
-      "Your Home Somewhere, POSCO THE SHARP Gallery, Seoul, Korea",
-      "Time-Warp, Artrium Mori, Seongju, Korea",
-    ],
-  ],
-  [
-    "2023",
-    [
-      "Meditation of Time, DOT Museum, Busan, Korea",
-      "Into a Time Frame, ARX Gallery, London, UK",
-    ],
-  ],
-  ["2022", ["Silent Move, The Trinity Gallery, Seoul, Korea"]],
-  [
-    "2021",
-    [
-      "At the Moment, Artside Gallery, Seoul, Korea",
-      "Listen to the Silence, SOUL Art Space, Busan, Korea",
-      "Lim Chang Min Solo Exhibition, GS Caltex Yeulmaru Museum, Yeosu, Korea",
-    ],
-  ],
-  ["2020", ["Borrowed Landscape, AB Gallery, Portland, USA"]],
-  [
-    "2019",
-    [
-      "Into a Time Frame, SOUL Art Space, Busan, Korea",
-      "The Aesthetics of Slowness, Expo Art Gallery, Yeosu, Korea",
-    ],
-  ],
-];
-
-const pressItems = [
-  [
-    "아리랑TV - [Arts Avenue 2018] Ep.11 - Into a Time Frame",
-    "2018. 03. 15",
-    "https://youtu.be/mOYiATm2N_w?si=JEVk35p14BNXYN2n",
-  ],
-  [
-    "[문화요] 창 너머, 풍경에 머무는 시간 ❘ 갤러리분도 ‘임창민 전’",
-    "2026. 05. 08",
-    "https://youtu.be/68AjGw-rsyA?si=X0Kb0ggDg1wiKaG_",
-  ],
-  [
-    "[MBN이 만난 작가] 사진과 영상을 결합하는 임창민 [MBN-i]",
-    "2021. 06. 11",
-    "https://youtu.be/zq3z4SwZV1Y?si=zOLWzAtwN-2lDjFU",
-  ],
-  [
-    "더샵갤러리 STAY # 스페셜 아트 도슨트 강희",
-    "2024. 03. 02",
-    "https://youtu.be/0YSwA-OT2WA?si=g2UKSfvOtSi0cQyR",
-  ],
-  [
-    "TBC문화로 채움 - 미디어아트 작가 임창민",
-    "2022. 12. 15",
-    "https://www.youtube.com/watch?v=XeaYo-8HW-o",
-  ],
-  [
-    "임창민의 사진과 영상의 결합 / 월간 「사진예술」 (11월호)",
-    "2021. 11. 24",
-    "https://youtu.be/TrUgYU4q1F4?si=eJntszECJBEOCj45",
-  ],
-  [
-    "[전시 따라잡기] 임창민 개인전…갤러리분도 22일까지",
-    "2026.05.05",
-    "https://www.idaegu.co.kr/news/articleView.html?idxno=547047",
-  ],
-  [
-    "사진과 동영상으로 빚어낸 정중동의 미학…homage to 박동준 2026_임창민 展",
-    "2026. 04. 27",
-    "https://www.yeongnam.com/web/view.php?key=20260427029379416",
-  ],
-  [
-    "고요 속 흐름을 담다···미디어아티스트 임창민 ‘Homage to 박동준’展, 대구 갤러리분도서 개막",
-    "2026. 04. 15",
-    "https://www.kbmaeil.com/article/20260415500542",
-  ],
-  [
-    "\"멈춰 있는 듯 흐르는 자연의 시간\"…임창민 '이터널 시즌즈'展",
-    "2025. 07. 14",
-    "https://www.news1.kr/life-culture/performance-exhibition/5844622",
-  ],
-  [
-    "세계 곳곳의 풍경, 한 화면에 엮인 영원한 계절의 사유, 미디어 아티스트 임창민 개인전《Eternal Seasons : INTO A TIME FRAME》展",
-    "2025. 07. 12",
-    "https://www.ikoreanspirit.com/news/articleView.html?idxno=80743",
-  ],
-  [
-    "아트리움 모리, 미디어 아티스트 임창민 작가 개인전 'Time-warp' 개최",
-    "2024. 07. 07",
-    "https://www.yeongnam.com/web/view.php?key=20240703010000419",
-  ],
-  [
-    "성주 아트리움모리, 미디어 아티스트 임창민 개인전 ‘타임워프(Time-warp)’",
-    "2024. 07. 03",
-    "https://www.imaeil.com/page/view/2024070312030394061",
-  ],
-];
-
 const page = document.body.dataset.page || "home";
 const app = document.querySelector("#app");
+let siteContent = window.portfolioContentDefaults;
 const assetPath = (filename) => window.worksStore ? window.worksStore.assetPath(filename) : `/assets/${filename}`;
 const pagePath = (name) => `/${name}/`;
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[character]);
+const safeExternalUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+  } catch {
+    return "";
+  }
+};
 
 function instagramIcon() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -212,11 +89,12 @@ function renderWork() {
       </section>`,
     )
     .join("");
-  const exhibitionGallery = exhibitionPhotos
+  const exhibition = siteContent.exhibition;
+  const exhibitionGallery = (Array.isArray(exhibition.items) ? exhibition.items : [])
     .map(
-      (caption, index) => `<figure class="exhibition-photo">
-        <img src="${assetPath(`exhibition/exhibition-${String(index + 1).padStart(2, "0")}.webp`)}" alt="${caption}" loading="lazy" decoding="async" />
-        <figcaption>${caption}</figcaption>
+      ({ image, caption }) => `<figure class="exhibition-photo">
+        <img src="${escapeHtml(assetPath(image))}" alt="${escapeHtml(caption)}" loading="lazy" decoding="async" />
+        <figcaption>${escapeHtml(caption)}</figcaption>
       </figure>`,
     )
     .join("");
@@ -224,7 +102,7 @@ function renderWork() {
   return `<main class="work-page page-content">
     <div class="works-by-year" aria-label="Selected works, organized by year">${yearSections}</div>
     <section class="exhibition-gallery" aria-labelledby="exhibition-gallery-title">
-      <h2 id="exhibition-gallery-title">Exhibition Views</h2>
+      <h2 id="exhibition-gallery-title">${escapeHtml(exhibition.title)}</h2>
       <div class="exhibition-grid">${exhibitionGallery}</div>
     </section>
     <dialog class="work-lightbox" aria-label="Artwork viewer">
@@ -238,62 +116,52 @@ function renderWork() {
 }
 
 function exhibitionList(items) {
-  return `<div class="exhibition-list">${items
-    .map(
-      ([year, entries]) => `<div class="exhibition-year">
-        <h3>${year}</h3>
-        <ul>${entries.map((entry) => `<li>${entry}</li>`).join("")}</ul>
-      </div>`,
-    )
-    .join("")}</div>`;
+  const groups = new Map();
+  (Array.isArray(items) ? items : []).forEach(({ year, title }) => {
+    const key = String(year || "");
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(title);
+  });
+  return `<div class="exhibition-list">${Array.from(groups, ([year, entries]) => `
+    <div class="exhibition-year">
+      <h3>${escapeHtml(year)}</h3>
+      <ul>${entries.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>
+    </div>`).join("")}</div>`;
 }
 
 function renderAbout() {
+  const about = siteContent.about;
+  const headings = about.headings;
   return `<main class="about-layout page-content">
     <nav class="about-index" aria-label="About sections">
-      <a href="#about">about</a>
-      <a href="#exhibitions">exhibitions</a>
-      <a href="#current">current</a>
+      <a href="#about">${escapeHtml(headings.navAbout)}</a>
+      <a href="#exhibitions">${escapeHtml(headings.navExhibitions)}</a>
+      <a href="#current">${escapeHtml(headings.navCurrent)}</a>
     </nav>
     <div class="about-content">
       <section id="about" class="about-intro">
-        <img class="portrait" src="${assetPath("profile.jpg")}" alt="Portrait of Lim Changmin" />
-        <h1>Lim Changmin</h1>
-        <div class="biography">
-          <p>Lim Chang Min is a Korean media artist and Professor in the Department of Video &amp; Animation at Keimyung University. His artistic practice explores the intersection of time, memory, landscape, and moving images through photography, video, and digital media.</p>
-          <p>He has served as a juror for the Tashkent International Biennale in Uzbekistan, an executive committee member of the Gwangju Biennale, and a judge for the Korean National Assembly Video Content Awards. He was also a Visiting Professor at Portland State University in the United States.</p>
-          <p>Lim's works have been exhibited at leading museums and institutions, including the National Museum of Modern and Contemporary Art, Korea (MMCA), Shanghai Museum of Contemporary Art (MoCA Shanghai), Seoul Museum of Art, and Daegu Art Museum. His works are included in museum and private collections and have been presented internationally in New York, Paris, Tokyo, Hong Kong, Dubai, Shanghai, London, and other cities.</p>
-          <p>In recent years, he has collaborated with major organizations and corporations, including LG, ACE Bed, POSCO, GS Caltex, and Incheon International Airport, producing a wide range of public art and media art projects.</p>
-        </div>
+        <img class="portrait" src="${escapeHtml(assetPath(about.portrait || "profile.jpg"))}" alt="Portrait of ${escapeHtml(about.name)}" />
+        <h1>${escapeHtml(about.name)}</h1>
+        <div class="biography">${(Array.isArray(about.biography) ? about.biography : []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</div>
       </section>
       <section id="exhibitions" class="about-section">
         <span id="history"></span>
-        <h2>Selected Solo Exhibitions</h2>
-        ${exhibitionList(soloExhibitions)}
-        <h2 class="group-heading">Selected Group Exhibitions</h2>
-        ${exhibitionList(soloExhibitions)}
+        <h2>${escapeHtml(headings.soloExhibitions)}</h2>
+        ${exhibitionList(about.soloExhibitions)}
+        <h2 class="group-heading">${escapeHtml(headings.groupExhibitions)}</h2>
+        ${exhibitionList(about.groupExhibitions)}
         <div class="education-block">
-          <h2>Education</h2>
-          <ul>
-            <li>MFA, Media Art Production, The City University of New York, USA</li>
-            <li>MA, Art in Media, New York University, USA</li>
-            <li>BFA, Fine Arts, Keimyung University, Republic of Korea</li>
-          </ul>
+          <h2>${escapeHtml(headings.education)}</h2>
+          <ul>${(Array.isArray(about.education) ? about.education : []).map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>
         </div>
       </section>
       <section id="current" class="about-section current-section">
-        <h2>Current</h2>
-        <div class="current-grid">
+        <h2>${escapeHtml(headings.current)}</h2>
+        <div class="current-grid">${(Array.isArray(about.current) ? about.current : []).map(({ heading, lines }) => `
           <div>
-            <h3>Professor</h3>
-            <p>Department of Video &amp; Animation</p>
-            <p>College of Fine Arts, Keimyung University</p>
-          </div>
-          <div>
-            <h3>Office</h3>
-            <p>Department of Video &amp; Animation, College of Fine Arts (Susan Hall 103)</p>
-            <p>Keimyung University 2139 Daemyeong-dong, Nam-gu, Daegu 42403, Korea</p>
-          </div>
+            <h3>${escapeHtml(heading)}</h3>
+            ${(Array.isArray(lines) ? lines : []).map((line) => `<p>${escapeHtml(line)}</p>`).join("")}
+          </div>`).join("")}
         </div>
       </section>
     </div>
@@ -301,14 +169,14 @@ function renderAbout() {
 }
 
 function renderPress() {
-  const items = pressItems
-    .map(
-      ([title, date, href]) => `<li class="press-item">
-        <a href="${href}" target="_blank" rel="noreferrer">${title}</a>
-        <time>${date}</time>
-      </li>`,
-    )
-    .join("");
+  const items = (Array.isArray(siteContent.press.items) ? siteContent.press.items : [])
+    .map(({ title, date, url }) => {
+      const safeUrl = safeExternalUrl(url);
+      return `<li class="press-item">
+        ${safeUrl ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noreferrer">${escapeHtml(title)}</a>` : escapeHtml(title)}
+        <time>${escapeHtml(date)}</time>
+      </li>`;
+    }).join("");
   return `<main class="press-page page-content">
     <ul class="press-list">${items}</ul>
   </main>`;
@@ -321,18 +189,43 @@ const pageContent = {
   press: renderPress,
 };
 
-async function initializeSite() {
-let loadError = false;
-if (page === "work" && window.worksStore.configured) {
-  try {
-    works = await window.worksStore.list();
-  } catch (error) {
-    console.error("Unable to load updated works.", error);
-    loadError = true;
-    works = [];
+function mergeContent(defaults, saved) {
+  if (Array.isArray(defaults)) return Array.isArray(saved) ? saved : defaults;
+  if (defaults && typeof defaults === "object") {
+    const source = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+    return Object.fromEntries(Object.entries(defaults).map(([key, value]) => [key, mergeContent(value, source[key])]));
   }
+  return typeof saved === typeof defaults ? saved : defaults;
 }
-app.innerHTML = `${header()}${loadError ? '<p role="alert">최신 작업물을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</p>' : ""}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
+
+async function initializeSite() {
+  const loadErrors = [];
+  if (window.worksStore?.configured && ["work", "about", "press"].includes(page)) {
+    if (page === "work") {
+      try {
+        works = await window.worksStore.list();
+      } catch (error) {
+        console.error("Unable to load updated works.", error);
+        loadErrors.push("최신 작업물을 불러오지 못했습니다.");
+        works = [];
+      }
+    }
+
+    const contentKey = page === "work" ? "exhibition" : page;
+    try {
+      const savedContent = await window.worksStore.getContent(contentKey);
+      if (savedContent) {
+        siteContent = {
+          ...siteContent,
+          [contentKey]: mergeContent(siteContent[contentKey], savedContent),
+        };
+      }
+    } catch (error) {
+      console.error(`Unable to load the ${contentKey} page content.`, error);
+      loadErrors.push("페이지 내용을 불러오지 못했습니다. 기본 내용을 표시합니다.");
+    }
+  }
+  app.innerHTML = `${header()}${loadErrors.map((error) => `<p role="alert">${escapeHtml(error)}</p>`).join("")}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
 
 if (page === "home") {
   // Content bounds in 480×270 frames, excluding borders baked into the videos.

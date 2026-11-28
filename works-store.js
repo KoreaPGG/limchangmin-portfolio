@@ -63,6 +63,20 @@
       } while (page.length === pageSize);
       return mergeWorks(rows);
     },
+    async getContent(pageKey) {
+      const rows = await request(`/rest/v1/site_content?select=page_key,content&page_key=eq.${encodeURIComponent(pageKey)}&limit=1`);
+      return rows[0]?.content || null;
+    },
+    async saveContent(pageKey, content, token) {
+      await request("/rest/v1/site_content?on_conflict=page_key", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates,return=minimal",
+        },
+        body: JSON.stringify({ page_key: pageKey, content }),
+      }, token);
+    },
     async signIn(email, password) {
       return request("/auth/v1/token?grant_type=password", {
         method: "POST",
