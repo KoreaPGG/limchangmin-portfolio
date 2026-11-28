@@ -8,7 +8,7 @@ for (const page of ["work", "about", "press"]) {
     const legacyPage = fs.readFileSync(`${page}.html`, "utf8");
 
     assert.match(cleanPage, new RegExp(`<body data-page="${page}">`));
-    assert.match(cleanPage, /href="\/styles\.css"/);
+    assert.match(cleanPage, /href="\/styles\.css(?:\?v=\d+)?"/);
     assert.match(legacyPage, new RegExp(`url=/${page}/`));
     assert.match(legacyPage, new RegExp(`href="/${page}/"`));
   });

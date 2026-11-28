@@ -202,7 +202,7 @@ function renderWork() {
             ({ title, image, video, previewScale, index }) => `<article class="work-card">
               <button class="work-image-button${video ? " work-image-button--video" : ""}" type="button" data-work-index="${index}" aria-label="${video ? "Play video" : "View artwork"}: ${escapeHtml(title)}">
                 ${video
-                  ? `<video class="work-video-preview" data-src="${escapeHtml(assetPath(video))}" poster="${escapeHtml(assetPath(image))}"${previewScale ? ` style="--preview-scale: ${Number(previewScale)}"` : ""} muted loop playsinline preload="none" aria-hidden="true"></video>`
+                  ? `<video class="work-video-preview" data-src="${escapeHtml(assetPath(video))}"${previewScale ? ` style="--preview-scale: ${Number(previewScale)}"` : ""} muted loop playsinline preload="none" aria-hidden="true"></video><span class="work-video-skeleton" aria-hidden="true"></span>`
                   : `<img src="${escapeHtml(assetPath(image))}" alt="${escapeHtml(title)}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async" />`}
               </button>
               <p>${escapeHtml(title)}</p>
@@ -421,7 +421,9 @@ if (page === "work") {
 
   const previewObserver = new IntersectionObserver((entries) => {
     entries.forEach(({ target: preview, isIntersecting }) => {
+      preview.classList.remove("is-playing");
       if (isIntersecting) {
+        preview.classList.add("is-loading");
         const source = preview.dataset.src;
         preview.muted = true;
         preview.src = source;
@@ -431,13 +433,20 @@ if (page === "work") {
           }
         });
       } else {
+        preview.classList.remove("is-loading");
         preview.pause();
         preview.removeAttribute("src");
         preview.load();
       }
     });
   });
-  document.querySelectorAll(".work-video-preview").forEach((preview) => previewObserver.observe(preview));
+  document.querySelectorAll(".work-video-preview").forEach((preview) => {
+    preview.addEventListener("playing", () => {
+      preview.classList.remove("is-loading");
+      preview.classList.add("is-playing");
+    });
+    previewObserver.observe(preview);
+  });
 
   function showWork(index) {
     activeIndex = (index + works.length) % works.length;
