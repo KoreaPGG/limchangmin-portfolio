@@ -31,6 +31,7 @@ test("deleting existing and newly added works removes them from the merged list"
   vm.runInNewContext(fs.readFileSync("works-store.js", "utf8"), { window, fetch });
 
   const initial = await window.worksStore.list();
+  assert.deepEqual(Array.from(initial, (work) => work.year), [2022, 2021, 2020, 2019]);
   await window.worksStore.remove(initial.find((work) => work.id === "original-a"), "admin-token");
   await window.worksStore.remove(initial.find((work) => work.id === "original-b"), "admin-token");
   await window.worksStore.remove(initial.find((work) => work.id === "new:1"), "admin-token");

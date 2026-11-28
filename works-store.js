@@ -29,7 +29,7 @@
       return row ? (row.deleted ? null : fromRow(row)) : { ...work, id: work.image };
     });
     works.push(...Array.from(overrides.values()).filter((row) => !row.deleted).map(fromRow));
-    return works.filter(Boolean).sort((a, b) => a.year - b.year);
+    return works.filter(Boolean).sort((a, b) => b.year - a.year);
   }
 
   function fromRow(row) {

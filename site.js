@@ -1,7 +1,7 @@
 const instagramUrl =
   "https://www.instagram.com/lim_changmin_official?igsh=Njd5ajR2eG5kZDli&igsi=Njd5ajR2eG5kZDli";
 
-let works = window.portfolioWorks;
+let works = [...window.portfolioWorks].sort((a, b) => b.year - a.year);
 
 const exhibitionPhotos = [
   "Jeju Museum of Art, 2021",
