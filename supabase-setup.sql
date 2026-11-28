@@ -15,6 +15,7 @@ create table public.works (
   image text not null,
   video text,
   preview_scale double precision check (preview_scale > 0),
+  deleted boolean not null default false,
   created_at timestamptz not null default now()
 );
 alter table public.works enable row level security;

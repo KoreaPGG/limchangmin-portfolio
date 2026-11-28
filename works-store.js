@@ -26,10 +26,10 @@
     const works = window.portfolioWorks.map((work) => {
       const row = overrides.get(work.image);
       overrides.delete(work.image);
-      return row ? fromRow(row) : { ...work, id: work.image };
+      return row ? (row.deleted ? null : fromRow(row)) : { ...work, id: work.image };
     });
-    works.push(...Array.from(overrides.values(), fromRow));
-    return works.sort((a, b) => a.year - b.year);
+    works.push(...Array.from(overrides.values()).filter((row) => !row.deleted).map(fromRow));
+    return works.filter(Boolean).sort((a, b) => a.year - b.year);
   }
 
   function fromRow(row) {
@@ -96,6 +96,17 @@
           Prefer: "resolution=merge-duplicates,return=minimal",
         },
         body: JSON.stringify(work),
+      }, token);
+    },
+    async remove(work, token) {
+      await this.save({
+        id: work.id,
+        title: work.title,
+        year: work.year,
+        image: work.image,
+        video: work.video || null,
+        preview_scale: work.previewScale || null,
+        deleted: true,
       }, token);
     },
   };

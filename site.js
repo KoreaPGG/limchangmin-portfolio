@@ -328,6 +328,7 @@ if (page === "work" && window.worksStore.configured) {
   } catch (error) {
     console.error("Unable to load updated works.", error);
     loadError = true;
+    works = [];
   }
 }
 app.innerHTML = `${header()}${loadError ? '<p role="alert">최신 작업물을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</p>' : ""}${(pageContent[page] || renderHome)()}${page === "home" ? "" : footer()}`;
