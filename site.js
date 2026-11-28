@@ -336,11 +336,11 @@ app.innerHTML = `${header()}${loadError ? '<p role="alert">최신 작업물을 �
 if (page === "home") {
   // Content bounds in 480×270 frames, excluding borders baked into the videos.
   const homeVideos = [
-    { source: "home-videos/work-003.mp4?v=2", bounds: [45, 3, 391, 264] },
-    { source: "home-videos/work-005.mp4?v=2", bounds: [36, 8, 412, 250] },
-    { source: "home-videos/work-045.mp4?v=2", bounds: [42, 2, 397, 266] },
-    { source: "home-videos/work-016.mp4?v=2", bounds: [39, 2, 403, 268] },
-    { source: "home-videos/work-065.mp4?v=2", bounds: [37, 0, 406, 270] },
+    { source: "home-videos/work-003.mp4?v=3", poster: "work-gallery/work-003.webp", bounds: [45, 3, 391, 264] },
+    { source: "home-videos/work-005.mp4?v=3", poster: "work-gallery/work-005.webp", bounds: [36, 8, 412, 250] },
+    { source: "home-videos/work-045.mp4?v=3", poster: "work-gallery/work-045.webp", bounds: [42, 2, 397, 266] },
+    { source: "home-videos/work-016.mp4?v=3", poster: "work-gallery/work-016.webp", bounds: [39, 2, 403, 268] },
+    { source: "home-videos/work-065.mp4?v=3", poster: "work-gallery/work-065.webp", bounds: [37, 0, 406, 270] },
   ];
   const video = document.querySelector(".hero-video");
   const retry = document.querySelector(".hero-retry");
@@ -385,6 +385,7 @@ if (page === "home") {
 
     retry.hidden = true;
     updateVideoScale();
+    video.poster = assetPath(currentVideo.poster);
     video.src = assetPath(lastVideo);
     video.load();
     playVideo();
