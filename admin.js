@@ -23,6 +23,14 @@ function message(text) {
   status.textContent = text;
 }
 
+function loginFailureMessage(error) {
+  const details = error instanceof Error ? error.message : String(error);
+  if (/invalid_credentials|invalid login credentials/i.test(details)) {
+    return "로그인하지 못했습니다. 이메일과 비밀번호를 확인해주세요.";
+  }
+  return `로그인하지 못했습니다. ${details}`;
+}
+
 function setContentDirty(dirty) {
   contentDirty = dirty;
   contentDraftState.textContent = dirty ? "저장되지 않은 변경사항" : "변경사항 없음";
@@ -298,7 +306,7 @@ login.addEventListener("submit", async (event) => {
     message("로그인했습니다.");
   } catch (error) {
     console.error("Admin login failed.", error);
-    message(`로그인하지 못했습니다. ${error.message}`);
+    message(loginFailureMessage(error));
   } finally {
     setBusy(false);
   }
