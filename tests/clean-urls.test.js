@@ -13,3 +13,15 @@ for (const page of ["work", "about", "press"]) {
     assert.match(legacyPage, new RegExp(`href="/${page}/"`));
   });
 }
+
+test("admin has a clean URL and redirects its legacy URL", () => {
+  const cleanPage = fs.readFileSync("admin/index.html", "utf8");
+  const legacyPage = fs.readFileSync("admin.html", "utf8");
+
+  assert.match(cleanPage, /href="https:\/\/limchangmin\.com\/admin\/"/);
+  assert.match(cleanPage, /href="\/admin\.css\?v=\d+"/);
+  assert.match(cleanPage, /src="\/admin\.js\?v=\d+"/);
+  assert.match(cleanPage, /id="login"/);
+  assert.match(legacyPage, /url=\/admin\//);
+  assert.match(legacyPage, /href="\/admin\//);
+});
